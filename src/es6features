@@ -1,0 +1,283 @@
+New features
+
+Here is a short overview of some of ECMAScript6's new features. Hopefully this gets you acquainted with some of the language specification's most frequently used new features.
+
+Modules
+
+In my opinion, the module is the single most important new feature in ES6. It allows you to separate your code into separate files in a modular way without worrying about cluttering the global namespace.
+
+For example, let's create a file math.js with a toy math library that exports the value of pi and a couple of pi-related functions:
+
+export const PI = 3.141592653589793;
+export function circumference(r) {
+    return 2 * PI * r;
+}
+export function area(r) {
+    return PI * r * r;
+}
+With modules, we can import this library's individual components from another file:
+
+import {PI, area} from "./math";
+console.log(area(PI));
+Or we can import everything into a single object:
+
+import * as math from "./math";
+console.log(math.area(math.PI));
+You can also export a single value as the default value, so that you can import it without needing brackets or a wildcard:
+
+// reverseString.js 
+export default function(str) {
+    return str.split("").reverse().join("");
+}
+// main.js
+import reverseString from "./reverseString";
+console.log(reverseString("Hello, world!"));
+const and let
+
+const is used for constant declarations, and let is used for variable declarations.
+
+If you try to reassign to a constant, the compiler will throw an error:
+
+const one = 1;
+one = 2; // SyntaxError: "one" is read-only
+let is similar to var, but it fixes a number of quirks about var that are often stumbling blocks to JavaScript newcomers. In fact, var has become obsolete at this point because it's let and consthave assumed its functionality.
+
+let is block-scoped
+
+var and let differ in their scoping mechanisms. A variable declared with var is function-scoped, which means that it is visible anywhere in the surrounding function. Meanwhile, a variable declared with let is block-scoped, which means it is only visible in its own code block. Calls to the variable outside its code block will lead to errors.
+
+// var
+console.log(less); // undefined
+if(1 < 2) {
+    var less = true;
+    console.log(less); // true
+}
+console.log(less); // true
+
+// let
+console.log(less); // Uncaught ReferenceError: less is not defined
+if(1 < 2) {
+    let less = true;
+    console.log(less); // true
+}
+console.log(less); // Uncaught ReferenceError: less is not defined
+const also exhibits this block scoping strategy.
+
+Duplicate let declarations are forbidden
+
+let is designed to catch potential assignment mistakes. While duplicate var declarations will behave like normal reassignment, duplicate let declarations are not allowed to prevent the common mistake of erroneous reassignment.
+
+var x = 1;
+var x = 2; // x equals 2
+
+let x = 1;
+let x = 2; // SyntaxError: Identifier 'x' has already been declared
+let variables rebound in each loop iteration
+
+Here is a common error that occurs when you have a function defined inside of a loop using var.
+
+for(var i = 0; i < 5; i++) {
+    setTimeout(function() {
+        console.log(i);
+    }, 10);
+};
+// logs 5 5 5 5 5
+This code will log the number 5 five times in a row, because the value of i will be 5 before the first time console.log is called. When we use let instead, the i inside of the function will correspond to the value on that particular iteration of the for-loop.
+
+for(let i = 0; i < 5; i++) {
+    setTimeout(() => {
+        console.log(i);
+    }, 10);
+};
+// logs 0 1 2 3 4
+Classes
+
+Object-oriented programming in JavaScript is different than classical OOP because it uses prototypes rather than classes. ES6 classes are a syntax shortcut for a common JavaScript pattern used to simulate classes. Below, I lay out prototype creation in ES5 and class creation in ES6.
+
+// ES5 way
+function Circle(x, y, radius) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+}
+Circle.prototype.move = function(x, y) {
+    this.x = x;
+    this.y = y;
+}
+Circle.prototype.area = function() {
+    return Math.PI * Math.pow(this.radius, 2);
+}
+
+// ES6 way
+class Circle {
+    constructor(x, y, radius) {
+        [this.x, this.y, this.radius] = [x, y, radius];
+    }
+    move(x, y) {
+        [this.x, this.y] = [x, y];
+    }
+    area() {
+      return Math.PI * Math.pow(this.radius, 2);
+    }
+}
+You can also extend classes in a manner consistent to standard object-oriented languages:
+
+// ES5 way
+function ColoredCircle(x, y, radius, color) {
+    Circle.call(this, x, y, radius);
+    this.color = color;
+}
+ColoredCircle.prototype = Object.create(Circle.prototype);
+
+// ES6 way
+class ColoredCircle extends Circle {
+    constructor(x, y, radius, color) {
+        super(x, y, radius);
+        this.color = color;
+    }
+}
+Object literal syntax
+
+It's common to create objects with property names matching variable names. ES6 includes new syntax to make this a little bit more concise:
+
+var x = 5,
+    y = 6;
+
+// ES5 way
+var coordinate = {x: x, y: y};
+
+// ES6 way
+let coordinate = {x, y};
+The syntax for function properties has also changed:
+
+// ES5 way
+var counter = {
+    count: 0,
+    increment: function() {
+        this.count++;
+    }
+};
+
+// ES6 way
+let counter = {
+    count: 0,
+    increment() {
+        this.count++;
+    }
+};
+Destructuring assignment
+
+Destructuring assignment is a nifty feature for doing several assignments at once. In ES5, you often have a series of variable declarations like this:
+
+var a = 1,
+    b = 2,
+    c = 3;
+In ES6 you can do it all at once with array destructuring:
+
+let [a, b, c] = [1, 2, 3];
+This is particularly nice for extracting values from an array:
+
+var personData = ["John", 12, true];
+
+// ES5 way
+var name = personData[0],
+    age = personData[1],
+    isMale = personData[2];
+    
+// ES6 way
+let  [name, age, isMale] = personData;
+and also for swapping variables:
+
+// ES5 way
+var tmp = a;
+a = b;
+b = tmp;
+
+// ES6 way
+[a, b] = [b, a];
+Destructuring assignment can be used with objects as well:
+
+var personData = {
+    name: "John",
+    age: 12,
+    isMale: true
+};
+
+// ES5 way
+var name = personData.name,
+    age = personData.age,
+    isMale: personData.isMale;
+
+// ES6 way
+let {name, age, isMale} = personData;
+This also works with nested object structures:
+
+var book = {
+    title: "A Tale of Two Cities",
+    dimensions: [12, 8, 3],
+    author: {
+      name: "Charles Dickens",
+    }
+};
+
+// ES5 way
+var title = book.title,
+    length = book.dimensions[0],
+    width = book.dimensions[1],
+    depth = book.dimensions[2],
+    name = book.author.name;
+
+// ES6 way
+let {title, dimensions: [length, width, depth], author: {name}} = book;
+Clear and concise.
+
+Arrow functions
+
+JavaScript developers frequently use function expressions, such as callbacks. However, code can often look messy when the keywords function and return are repeated many times. ES6 has new syntax to make function expressions less verbose.
+
+Let's compare ES6 function expression handling with expression handling in previous Ecmascript versions.
+
+var list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+// ES3 way
+var sumOfSquares = 0;
+for(var i = 0; i < list.length; i++) {
+    var n = list[i],
+        square = n * n;
+    sumOfSquares += square;
+}
+
+// ES5 way
+var sumOfSquares = list
+    .map(function(x) { return x * x; })
+    .reduce(function(a, b) { return a + b; });
+
+// ES6 way
+let sumOfSquares = list.map(x => x * x).reduce((a, b) => a + b);
+For functions consisting of more than one statement, you can wrap the right-hand side of the arrow function in curly braces:
+
+// ES5 way
+window.onclick = function(e) {
+    if(e.ctrlKey) console.log("Ctrl click");
+    else console.log("Normal click")
+}
+
+// ES6 way
+window.onclick = (e) => {
+    if(e.ctrlKey) console.log("Ctrl click");
+    else console.log("Normal click")
+}
+Template strings
+
+There is a new type of string literal that makes it easier to insert dynamic values into strings, and also to deal with multi-line strings. Instead of double quotes or single quotes, template strings are delimited by backticks.
+
+var weight = 80,
+    height = 1.8;
+    
+// ES5 way
+console.log("You are " + height + "m tall and weigh " + weight + "kg.\n" +
+"Your BMI is " + weight / (height * height) + ".");
+
+// ES6 way
+console.log(`You are ${height}m tall and weigh ${weight}kg.
+Your BMI is ${weight / (height * height)}.`);
