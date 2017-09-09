@@ -5,3 +5,5 @@ console.log(area(PI));
 
 import * as math from "./math"; 
 console.log(math.area(math.PI));
+
+console.log('Changes');

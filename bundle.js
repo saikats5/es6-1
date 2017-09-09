@@ -62,6 +62,8 @@
 
 	console.log(math.area(math.PI));
 
+	console.log('Changes');
+
 /***/ }),
 /* 1 */
 /***/ (function(module, exports) {
